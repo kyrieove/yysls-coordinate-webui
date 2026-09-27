@@ -597,6 +597,15 @@ if HAVE_VIS:
     md = vis.MotionDetector((0, 0, 40, 60), threshold=2.0, still_frames=3, poll=0.01)
     check("MotionDetector 参数就绪", md.still_frames == 3 and md.threshold == 2.0)
 
+print("== 10. 阶段 0 地图探针的纯算法（probe_map --selftest）==")
+if HAVE_VIS:
+    p = subprocess.run([sys.executable, str(PROJECT / "rpa" / "probe_map.py"), "--selftest"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       cwd=str(PROJECT))
+    out = (p.stdout or "") + (p.stderr or "")
+    check("probe_map 自检通过（相位相关 / 十字 / PNG）", p.returncode == 0 and "全部通过" in out,
+          out.strip().splitlines()[-1] if out.strip() else "无输出")
+
 # ---------------------------------------------------------------------------
 # 收尾：清掉自测产生的所有临时产物（含手工跑出来的 stdout 重定向文件）
 for junk in (PROJECT / "raw" / "rpa").glob("_selftest*"):
